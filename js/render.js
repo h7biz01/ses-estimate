@@ -241,7 +241,7 @@ function renderDoc(docType, calcResult, formData, settings) {
       <table class="doc-company-tbl">
         <tr><td class="dc-lbl">住　所</td><td>${addr}${tel ? '<br>TEL　' + tel : ''}</td></tr>
         <tr><td class="dc-lbl">会社名</td>
-            <td class="dc-name">${company}<span class="seal">㊞</span></td></tr>
+            <td class="dc-name">${company}<img src="assets/seal.png" class="seal-img" alt="印"></td></tr>
       </table>
     </div>
   </div>

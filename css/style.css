@@ -177,6 +177,7 @@ body {
 .dc-lbl { white-space: nowrap; color: #555; }
 .dc-name { font-weight: bold; font-size: 10pt; }
 .seal { display: inline-block; margin-left: 8px; font-size: 18pt; color: #cc0000; }
+.seal-img { height: 52px; width: auto; margin-left: 10px; vertical-align: middle; opacity: 0.85; }
 
 /* --- 区切り線 --- */
 .doc-hr { border: none; border-top: 2px solid var(--doc-border); margin: 8px 0; }
