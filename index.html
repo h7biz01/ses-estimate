@@ -5,8 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SES見積・注文書 作成ツール</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    #pw-gate {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #0f172a;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #pw-gate .pw-box {
+      background: #1e293b; border-radius: 12px;
+      padding: 40px 36px; width: 320px; text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    #pw-gate h2 { color: #f1f5f9; font-size: 16px; margin-bottom: 6px; }
+    #pw-gate p  { color: #94a3b8; font-size: 12px; margin-bottom: 20px; }
+    #pw-gate input {
+      width: 100%; padding: 10px 12px; border-radius: 6px;
+      border: 1px solid #475569; background: #0f172a; color: #f1f5f9;
+      font-size: 15px; text-align: center; letter-spacing: 4px;
+      margin-bottom: 12px;
+    }
+    #pw-gate input:focus { outline: none; border-color: #1a56db; }
+    #pw-gate button {
+      width: 100%; padding: 10px; border-radius: 6px; border: none;
+      background: #1a56db; color: #fff; font-size: 14px; cursor: pointer;
+    }
+    #pw-gate button:hover { background: #1741b5; }
+    #pw-error { color: #f87171; font-size: 12px; margin-top: 8px; min-height: 18px; }
+  </style>
 </head>
 <body>
+
+<!-- パスワードゲート -->
+<div id="pw-gate">
+  <div class="pw-box">
+    <h2>SES 見積・注文書ツール</h2>
+    <p>パスワードを入力してください</p>
+    <input type="password" id="pw-input" placeholder="••••" autofocus>
+    <button onclick="checkPassword()">ログイン</button>
+    <div id="pw-error"></div>
+  </div>
+</div>
+<script>
+  (function() {
+    // セッション中は再入力不要
+    if (sessionStorage.getItem('ses_auth') === '1') {
+      document.getElementById('pw-gate').style.display = 'none';
+    }
+    // Enterキー対応
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && document.getElementById('pw-gate').style.display !== 'none') {
+        checkPassword();
+      }
+    });
+  })();
+
+  function checkPassword() {
+    const val = document.getElementById('pw-input').value;
+    if (val === 'unk0') {
+      sessionStorage.setItem('ses_auth', '1');
+      document.getElementById('pw-gate').style.display = 'none';
+    } else {
+      document.getElementById('pw-error').textContent = 'パスワードが違います';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  }
+</script>
 
 <!-- ================================================================
      ヘッダー
