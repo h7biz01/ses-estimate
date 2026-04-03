@@ -394,7 +394,13 @@
           ③ 下記SQLをSQL Editorで実行 →
           ④ URLとKeyを入力して「接続」
         </div>
-        <pre class="settings-sql">-- SQL Editor で実行してください
+        <textarea readonly rows="11" onclick="this.select()" style="
+          display:block; width:100%; margin:8px 14px; box-sizing:border-box;
+          width:calc(100% - 28px);
+          background:#1e293b; color:#e2e8f0; font-family:monospace;
+          font-size:11px; line-height:1.6; padding:12px 14px;
+          border:none; border-radius:6px; resize:none; cursor:pointer;
+        ">-- SQL Editor で実行してください（クリックで全選択）
 create table ses_estimates (
   id          uuid default gen_random_uuid() primary key,
   created_at  timestamptz default now(),
@@ -405,7 +411,7 @@ create table ses_estimates (
   form_data   jsonb not null
 );
 alter table ses_estimates enable row level security;
-create policy "allow_all" on ses_estimates for all using (true) with check (true);</pre>
+create policy "allow_all" on ses_estimates for all using (true) with check (true);</textarea>
         <div class="form-grid">
           <div class="field full">
             <label>Supabase URL</label>
