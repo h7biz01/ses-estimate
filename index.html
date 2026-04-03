@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SES見積・注文書 作成ツール</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ================================================================
+     ヘッダー
+     ================================================================ -->
+<header class="app-header">
+  <h1>SES 見積・注文書 作成ツール</h1>
+  <span class="subtitle">入力内容は自動保存されます</span>
+</header>
+
+<!-- ================================================================
+     タブバー
+     ================================================================ -->
+<nav class="tab-bar">
+  <button class="tab-btn active" data-tab="form">入力フォーム</button>
+  <button class="tab-btn" data-tab="mitsumori">見積書</button>
+  <button class="tab-btn" id="tab-doc2-btn" data-tab="doc2">注文書</button>
+  <button class="tab-btn" data-tab="settings">設定</button>
+</nav>
+
+<!-- ================================================================
+     入力フォームパネル
+     ================================================================ -->
+<div class="tab-panel active" id="panel-form">
+<div class="form-wrapper">
+<form id="formMain" autocomplete="off">
+
+  <!-- 基本情報 -->
+  <div class="form-section">
+    <div class="form-section-title">基本情報</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>発行日</label>
+        <input type="date" id="issueDate">
+      </div>
+      <div class="field">
+        <label>管理番号（任意）</label>
+        <input type="text" id="managementNo" placeholder="例：EST-2025-001">
+      </div>
+      <div class="field">
+        <label>クライアント名（見積書宛先）</label>
+        <input type="text" id="clientName" placeholder="例：株式会社○○">
+      </div>
+      <div class="field">
+        <label>注文先会社名（注文書/発注書宛先）</label>
+        <input type="text" id="orderCompanyName" placeholder="協力会社名・BP会社名">
+      </div>
+      <div class="field full">
+        <label>業務内容</label>
+        <input type="text" id="businessContent" placeholder="例：業務支援及びそれに付随する業務">
+      </div>
+      <div class="field full">
+        <label>作業場所</label>
+        <input type="text" id="workLocation" placeholder="例：貴社指定場所">
+      </div>
+      <div class="field">
+        <label>作業期間 開始</label>
+        <input type="date" id="startDate">
+      </div>
+      <div class="field">
+        <label>作業期間 終了</label>
+        <input type="date" id="endDate">
+      </div>
+      <div class="field">
+        <label>作業開始時間</label>
+        <input type="time" id="startTime" value="10:00">
+      </div>
+      <div class="field">
+        <label>作業終了時間</label>
+        <input type="time" id="endTime" value="19:00">
+      </div>
+      <div class="field">
+        <label>休憩時間</label>
+        <input type="time" id="breakTime" value="01:00">
+      </div>
+      <div class="field">
+        <label>週稼働（日数）</label>
+        <input type="number" id="weeklyDays" min="1" max="7" value="5">
+      </div>
+      <div class="field">
+        <label>契約形態</label>
+        <select id="contractType">
+          <option value="業務委託">業務委託</option>
+          <option value="準委任">準委任</option>
+          <option value="請負">請負</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>支払方法</label>
+        <select id="paymentType">
+          <option value="月給">月給</option>
+          <option value="時給">時給</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>支払いサイト（日）</label>
+        <input type="number" id="paymentSite" value="30" min="0" max="90">
+        <div class="field-hint">30 → 月末締め翌月末日払い</div>
+      </div>
+      <div class="field">
+        <label>自動更新</label>
+        <select id="autoRenewal">
+          <option value="無">無</option>
+          <option value="有">有</option>
+        </select>
+      </div>
+      <div class="field" id="autoRenewalPeriodRow" style="display:none">
+        <label>自動更新期間</label>
+        <input type="text" id="autoRenewalPeriod" placeholder="例：1ヶ月、3ヶ月">
+      </div>
+    </div>
+  </div>
+
+  <!-- 精算設定 -->
+  <div class="form-section">
+    <div class="form-section-title">精算設定</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>精算方法</label>
+        <select id="settlementType">
+          <option value="中央割">中央割（上下対称）</option>
+          <option value="上下割">上下割（上下非対称）</option>
+          <option value="固定">固定（精算なし）</option>
+          <option value="時給">時給</option>
+        </select>
+      </div>
+      <div class="field" id="baseHoursOverrideRow">
+        <label>基本時間 手動設定（0=自動）</label>
+        <input type="number" id="baseHoursOverride" min="0" max="300" value="0" placeholder="0">
+        <div class="field-hint" id="baseHoursPreview">基本時間: 自動計算</div>
+      </div>
+      <div class="field" id="settlementRangeRow">
+        <label>控除幅（時間）</label>
+        <input type="number" id="deductionRange" min="0" max="100" value="20">
+      </div>
+      <div class="field" id="settlementMethodRow">
+        <label>超過幅（時間）</label>
+        <input type="number" id="excessRange" min="0" max="100" value="20">
+      </div>
+      <div class="field">
+        <label>時間単位（分）</label>
+        <select id="timeUnit">
+          <option value="15">15分</option>
+          <option value="30">30分</option>
+          <option value="60">60分（1時間）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>時間区切り</label>
+        <select id="timeInterval">
+          <option value="日ごと">日ごと</option>
+          <option value="月ごと">月ごと</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>端数処理（10円未満）</label>
+        <select id="roundingType">
+          <option value="切捨て">切捨て</option>
+          <option value="切上げ">切上げ</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 作業者 -->
+  <div class="form-section">
+    <div class="form-section-title">作業者①（主要員）</div>
+    <div class="worker-row">
+      <div>
+        <div class="worker-num">氏名</div>
+        <input type="text" id="w0_name" placeholder="氏 名">
+      </div>
+      <div>
+        <div class="worker-num">フリガナ</div>
+        <input type="text" id="w0_kana" placeholder="シ メイ">
+      </div>
+      <div>
+        <div class="worker-num">週稼働</div>
+        <input type="number" id="w0_days" min="1" max="7" value="5">
+      </div>
+      <div>
+        <div class="worker-num">月単価（円）</div>
+        <input type="number" id="w0_price" min="0" placeholder="500000">
+      </div>
+    </div>
+    <!-- 計算プレビュー -->
+    <div class="calc-preview" id="calcPreview0"></div>
+
+    <!-- 追加要員フラグ -->
+    <div class="flag-row">
+      <label>
+        <input type="checkbox" id="isMultiWorker">
+        追加要員あり（②〜⑤）
+      </label>
+      <span style="font-size:11px;color:var(--text-muted)">※契約形態・業務時間・精算が同じ場合のみ</span>
+    </div>
+  </div>
+
+  <!-- 追加要員 -->
+  <div class="form-section" id="multiWorkerSection" style="display:none">
+    <div class="form-section-title">追加要員（②〜⑤）</div>
+    <!-- ②〜⑤ の入力行 -->
+    <script>
+      (function() {
+        const labels = ['②','③','④','⑤'];
+        document.addEventListener('DOMContentLoaded', function() {
+          const section = document.getElementById('multiWorkerSection');
+          labels.forEach(function(lbl, idx) {
+            const i = idx + 1;
+            const row = document.createElement('div');
+            row.className = 'worker-row';
+            row.innerHTML =
+              '<div><div class="worker-num">氏名 ' + lbl + '</div>' +
+              '<input type="text" id="w' + i + '_name" placeholder="氏 名"></div>' +
+              '<div><div class="worker-num">フリガナ</div>' +
+              '<input type="text" id="w' + i + '_kana" placeholder="シ メイ"></div>' +
+              '<div><div class="worker-num">週稼働</div>' +
+              '<input type="number" id="w' + i + '_days" min="1" max="7" value="5"></div>' +
+              '<div><div class="worker-num">月単価（円）</div>' +
+              '<input type="number" id="w' + i + '_price" min="0" placeholder="500000"></div>';
+            section.appendChild(row);
+          });
+        });
+      })();
+    </script>
+  </div>
+
+  <!-- オプション -->
+  <div class="form-section">
+    <div class="form-section-title">オプション</div>
+
+    <!-- フラグ -->
+    <div class="flag-row">
+      <label>
+        <input type="checkbox" id="isBP">
+        BPから人材を借りる（注文書→発注書に変更）
+      </label>
+      <label>
+        <input type="checkbox" id="isReceipt">
+        請書を作成（注文書→請書に変更）
+      </label>
+    </div>
+    <div class="flag-row">
+      <label>
+        <input type="checkbox" id="travelIncluded" checked>
+        交通費：込み
+      </label>
+      <div class="field" style="margin:0;padding:0;flex:1;min-width:200px">
+        <input type="text" id="travelNote" placeholder="交通費備考">
+      </div>
+    </div>
+    <div class="flag-row">
+      <div class="field" style="margin:0;padding:0;flex:1">
+        <label style="font-size:11px;color:var(--text-muted)">出張・宿泊備考</label>
+        <input type="text" id="businessTripNote" placeholder="備考欄（出張交通費・宿泊費）">
+      </div>
+    </div>
+
+    <!-- 初月日割 -->
+    <div class="flag-row">
+      <label>
+        <input type="checkbox" id="isDailyCalc">
+        初月日割計算
+      </label>
+      <span style="font-size:11px;color:var(--text-muted)">※追加要員と併用不可</span>
+    </div>
+    <div id="dailySection" style="display:none">
+      <div class="form-grid">
+        <div class="field">
+          <label>日割 開始日</label>
+          <input type="date" id="dailyStartDate">
+        </div>
+        <div class="field">
+          <label>日割 終了日</label>
+          <input type="date" id="dailyEndDate">
+        </div>
+        <div class="field">
+          <label>月稼働予定日数</label>
+          <input type="number" id="dailyWorkDays" min="1" max="31" placeholder="例：15">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- アクション -->
+  <div class="form-section">
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" onclick="switchTab('mitsumori')">見積書を確認</button>
+      <button type="button" class="btn btn-primary" onclick="switchTab('doc2')" id="btn-doc2">注文書を確認</button>
+      <button type="button" class="btn btn-danger" onclick="resetForm()">リセット</button>
+    </div>
+  </div>
+
+</form>
+</div>
+</div><!-- /panel-form -->
+
+<!-- ================================================================
+     見積書パネル
+     ================================================================ -->
+<div class="tab-panel" id="panel-mitsumori">
+  <div class="preview-panel-wrap">
+    <div class="preview-toolbar">
+      <h2>御見積書 プレビュー</h2>
+      <button class="btn btn-ghost" onclick="switchTab('form')">← 入力に戻る</button>
+      <button class="btn btn-print" onclick="printDoc('mitsumori')">🖨 印刷 / PDF保存</button>
+    </div>
+    <div id="preview-mitsumori"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     注文書/発注書/請書パネル
+     ================================================================ -->
+<div class="tab-panel" id="panel-doc2">
+  <div class="preview-panel-wrap">
+    <div class="preview-toolbar">
+      <h2 id="doc2-preview-title">注文書 プレビュー</h2>
+      <button class="btn btn-ghost" onclick="switchTab('form')">← 入力に戻る</button>
+      <button class="btn btn-print" onclick="printDoc('doc2')">🖨 印刷 / PDF保存</button>
+    </div>
+    <div id="preview-doc2"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     設定パネル
+     ================================================================ -->
+<div class="tab-panel" id="panel-settings">
+  <div class="settings-wrapper">
+    <div class="settings-note">
+      書類に表示される自社（発行元）の情報を設定します。変更は自動保存されます。
+    </div>
+    <form id="formSettings">
+      <div class="form-section">
+        <div class="form-section-title">自社情報（書類発行元）</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label>会社名</label>
+            <input type="text" id="s_companyName" placeholder="株式会社○○">
+          </div>
+          <div class="field full">
+            <label>住所</label>
+            <textarea id="s_address" rows="3" placeholder="〒000-0000&#10;東京都..."></textarea>
+          </div>
+          <div class="field">
+            <label>電話番号</label>
+            <input type="text" id="s_tel" placeholder="03-0000-0000">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================================================================
+     計算プレビュー更新（入力リアルタイム）
+     ================================================================ -->
+<script>
+  // calc-preview ①を入力変更のたびに更新
+  function updateCalcPreview() {
+    const p = document.getElementById('calcPreview0');
+    if (!p) return;
+    const price = parseInt(document.getElementById('w0_price')?.value) || 0;
+    const stype = document.getElementById('settlementType')?.value || '中央割';
+    const rtype = document.getElementById('roundingType')?.value || '切捨て';
+    const base  = parseInt(document.getElementById('baseHoursOverride')?.value) || 0;
+    const decl  = parseInt(document.getElementById('deductionRange')?.value) || 0;
+    const excl  = parseInt(document.getElementById('excessRange')?.value) || 0;
+    const startDate = document.getElementById('startDate')?.value || '';
+    const endDate   = document.getElementById('endDate')?.value || '';
+
+    if (!price) { p.textContent = '単価を入力すると計算結果が表示されます'; return; }
+
+    // 簡易計算
+    const startT = document.getElementById('startTime')?.value || '10:00';
+    const endT   = document.getElementById('endTime')?.value || '19:00';
+    const brk    = document.getElementById('breakTime')?.value || '01:00';
+    const wDays  = parseInt(document.getElementById('weeklyDays')?.value) || 5;
+
+    function toH(t) { const [h,m]=(t||'0:0').split(':').map(Number); return h+m/60; }
+    const daily = toH(endT) - toH(startT) - toH(brk);
+    const bh = base > 0 ? base : (wDays * daily * 4);
+
+    let msg = '';
+    if (stype !== '固定' && stype !== '時給') {
+      const rawRate = price / bh;
+      const rate = rtype === '切上げ' ? Math.ceil(rawRate/10)*10 : Math.floor(rawRate/10)*10;
+      const lower = bh - decl, upper = bh + excl;
+      msg = `基本時間: ${bh}h　精算幅: ${lower}h〜${upper}h　時給: ${rate.toLocaleString()}円`;
+    } else if (stype === '時給') {
+      msg = `時給単価: ${price.toLocaleString()}円`;
+    } else {
+      msg = `固定: ${price.toLocaleString()}円/月`;
+    }
+
+    if (startDate && endDate) {
+      const s = new Date(startDate+'T00:00:00'), e = new Date(endDate+'T00:00:00');
+      const months = (e.getFullYear()-s.getFullYear())*12+(e.getMonth()-s.getMonth())+1;
+      if (months > 0) {
+        const total = price * months;
+        msg += `　→ ${months}ヶ月 合計: ${total.toLocaleString()}円（税込: ${Math.floor(total*1.1).toLocaleString()}円）`;
+      }
+    }
+    p.textContent = msg;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('formMain').addEventListener('input', updateCalcPreview);
+    document.getElementById('formMain').addEventListener('change', updateCalcPreview);
+    updateCalcPreview();
+  });
+</script>
+
+<script src="js/calc.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

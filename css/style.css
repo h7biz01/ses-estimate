@@ -1,0 +1,456 @@
+/* ================================================================
+   共通・リセット
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #1a56db;
+  --primary-light: #e8f0fe;
+  --border: #cbd5e1;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --label-bg: #f1f5f9;
+  --doc-border: #475569;
+  --accent: #0f172a;
+}
+
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', 'MS PGothic', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ================================================================
+   ヘッダー
+   ================================================================ */
+.app-header {
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.app-header h1 { font-size: 15px; font-weight: 600; letter-spacing: .5px; }
+.app-header .subtitle { font-size: 11px; color: #94a3b8; margin-left: auto; }
+
+/* ================================================================
+   タブ
+   ================================================================ */
+.tab-bar {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  padding: 0 16px;
+  gap: 2px;
+  position: sticky;
+  top: 41px;
+  z-index: 90;
+}
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.tab-btn:hover  { color: var(--primary); background: var(--primary-light); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+/* ================================================================
+   パネル
+   ================================================================ */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ================================================================
+   フォームパネル
+   ================================================================ */
+.form-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+.form-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.form-section-title {
+  background: var(--label-bg);
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+}
+.form-grid .field { padding: 8px 14px; border-bottom: 1px solid var(--border); }
+.form-grid .field:nth-child(odd)  { border-right: 1px solid var(--border); }
+.form-grid .field.full { grid-column: 1 / -1; }
+
+.field label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  background: #fff;
+  transition: border-color .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(26,86,219,.15);
+}
+.field textarea { resize: vertical; min-height: 60px; }
+.field input[type="number"] { -moz-appearance: textfield; }
+.field input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
+
+.field-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.flag-row {
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.flag-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.flag-row input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary);
+}
+
+/* 作業者セクション */
+.worker-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 80px 130px;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  align-items: end;
+}
+.worker-row:last-child { border-bottom: none; }
+.worker-num {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+/* 計算結果プレビュー */
+.calc-preview {
+  background: var(--primary-light);
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 8px 14px;
+  font-size: 12px;
+  color: #1e40af;
+}
+
+/* フォームアクション */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: var(--label-bg);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 8px 8px;
+}
+
+/* ボタン共通 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.btn-primary:hover { background: #1741b5; }
+.btn-ghost { background: #fff; color: var(--text); }
+.btn-ghost:hover { background: var(--label-bg); }
+.btn-danger { background: #fff; color: #dc2626; border-color: #fca5a5; }
+.btn-danger:hover { background: #fef2f2; }
+.btn-print { background: #059669; color: #fff; border-color: #059669; }
+.btn-print:hover { background: #047857; }
+
+/* ================================================================
+   プレビューパネル
+   ================================================================ */
+.preview-panel-wrap {
+  padding: 20px 16px;
+  background: #e2e8f0;
+  min-height: calc(100vh - 80px);
+}
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.preview-toolbar h2 { font-size: 14px; font-weight: 600; margin-right: auto; }
+
+/* ================================================================
+   書類 (A4)
+   ================================================================ */
+.a4-page {
+  width: 210mm;
+  min-height: 297mm;
+  background: #fff;
+  margin: 0 auto;
+  padding: 10mm 12mm;
+  box-shadow: 0 4px 24px rgba(0,0,0,.15);
+  font-size: 9pt;
+  font-family: 'Hiragino Mincho ProN', 'MS Mincho', 'Yu Mincho', serif;
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.doc-table col { width: calc(100% / 16); }
+
+/* 全セルの基本スタイル */
+.doc-table td {
+  padding: 2px 4px;
+  border: 1px solid #c0c0c0;
+  vertical-align: middle;
+  font-size: 8.5pt;
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+/* 発行日行 */
+.issue-date { text-align: right; font-size: 8pt; }
+
+/* タイトル */
+.title-row td { border: none !important; }
+.doc-title {
+  text-align: center;
+  font-size: 18pt;
+  font-weight: bold;
+  padding: 8px 0 6px !important;
+  letter-spacing: 6px;
+  border: none !important;
+}
+
+/* 宛先 */
+.recipient {
+  font-size: 13pt;
+  font-weight: bold;
+  padding: 4px 8px !important;
+  border: none !important;
+}
+.honorific {
+  font-size: 11pt;
+  border: none !important;
+  padding: 4px 0 4px 2px !important;
+}
+
+/* 本文 */
+.body-text {
+  border: none !important;
+  font-size: 9pt;
+  padding: 4px 8px !important;
+}
+
+/* 会社情報 */
+.company-info {
+  border: none !important;
+  font-size: 8pt;
+  vertical-align: top;
+  padding: 4px 8px !important;
+  line-height: 1.6;
+}
+.company-name {
+  font-size: 10pt;
+  font-weight: bold;
+  border: none !important;
+  padding: 2px 4px !important;
+}
+.seal-box {
+  text-align: center;
+  border: 1px solid var(--doc-border) !important;
+  font-size: 18pt;
+  color: #cc0000;
+  width: 24px;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 !important;
+}
+
+/* スペーサー */
+.spacer td { border: none !important; height: 6px; }
+.mini-spacer td { border: none !important; height: 3px; }
+.divider td { height: 4px; border-top: 2px solid var(--doc-border) !important; border-left: none !important; border-right: none !important; border-bottom: none !important; }
+
+/* ラベルセル */
+.lbl {
+  background: var(--label-bg);
+  font-weight: bold;
+  font-size: 8pt;
+  text-align: center;
+}
+.lbl-sm {
+  background: #f8f8f8;
+  font-size: 7.5pt;
+  text-align: center;
+  color: #444;
+}
+.lbl-sm.right { text-align: right; }
+.notes-lbl { text-align: left !important; font-size: 8pt; }
+
+/* 特記事項 */
+.notes {
+  font-size: 7.5pt;
+  line-height: 1.5;
+  vertical-align: top;
+  padding: 4px 6px !important;
+  white-space: pre-wrap;
+}
+
+/* セクションヘッダー */
+.section-hdr td {
+  font-weight: bold;
+  font-size: 9pt;
+  background: var(--label-bg);
+  border-top: 1px solid var(--doc-border) !important;
+}
+.detail-hdr td {
+  background: #e8e8e8;
+  font-size: 7.5pt;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* 詳細行 */
+.detail-data td { font-size: 8pt; }
+
+/* 合計行 */
+.total-row td { border-top: 1px solid var(--doc-border) !important; }
+.total-lbl {
+  background: var(--label-bg);
+  font-weight: bold;
+  text-align: center;
+  font-size: 9pt;
+}
+.total-val {
+  font-size: 10pt;
+  font-weight: bold;
+  text-align: right !important;
+  padding-right: 8px !important;
+}
+
+/* テキスト配置 */
+.text-c { text-align: center; }
+.text-r { text-align: right; padding-right: 4px !important; }
+.small { font-size: 7.5pt; }
+
+/* ================================================================
+   設定パネル
+   ================================================================ */
+.settings-wrapper {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 0 16px 40px;
+}
+.settings-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+}
+
+/* ================================================================
+   印刷
+   ================================================================ */
+@media print {
+  body { background: #fff; }
+  .app-header, .tab-bar, .preview-toolbar, .btn { display: none !important; }
+  .tab-panel { display: block !important; }
+  .preview-panel-wrap { background: none; padding: 0; }
+  .a4-page {
+    width: 100%;
+    min-height: auto;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+  @page { size: A4 portrait; margin: 10mm 12mm; }
+  .doc-table td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ================================================================
+   レスポンシブ
+   ================================================================ */
+@media (max-width: 768px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .field:nth-child(odd) { border-right: none; }
+  .form-grid .field.full { grid-column: 1; }
+  .worker-row { grid-template-columns: 1fr 1fr; }
+  .a4-page { width: 100%; min-height: auto; padding: 4mm 4mm; font-size: 7pt; }
+}
