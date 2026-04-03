@@ -6,6 +6,7 @@
   <title>SES見積・注文書 作成ツール</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* パスワードゲート */
     #pw-gate {
       position: fixed; inset: 0; z-index: 9999;
       background: #0f172a;
@@ -21,8 +22,7 @@
     #pw-gate input {
       width: 100%; padding: 10px 12px; border-radius: 6px;
       border: 1px solid #475569; background: #0f172a; color: #f1f5f9;
-      font-size: 15px; text-align: center; letter-spacing: 4px;
-      margin-bottom: 12px;
+      font-size: 15px; text-align: center; letter-spacing: 4px; margin-bottom: 12px;
     }
     #pw-gate input:focus { outline: none; border-color: #1a56db; }
     #pw-gate button {
@@ -46,23 +46,15 @@
   </div>
 </div>
 <script>
-  (function() {
-    // セッション中は再入力不要
-    if (sessionStorage.getItem('ses_auth') === '1') {
-      document.getElementById('pw-gate').style.display = 'none';
-    }
-    // Enterキー対応
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && document.getElementById('pw-gate').style.display !== 'none') {
-        checkPassword();
-      }
-    });
-  })();
-
+  if (sessionStorage.getItem('ses_auth') === '1') {
+    document.getElementById('pw-gate').style.display = 'none';
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && document.getElementById('pw-gate').style.display !== 'none') checkPassword();
+  });
   function checkPassword() {
-    const val = document.getElementById('pw-input').value;
-    if (val === 'unk0') {
-      sessionStorage.setItem('ses_auth', '1');
+    if (document.getElementById('pw-input').value === 'unk0') {
+      sessionStorage.setItem('ses_auth','1');
       document.getElementById('pw-gate').style.display = 'none';
     } else {
       document.getElementById('pw-error').textContent = 'パスワードが違います';
@@ -72,26 +64,24 @@
   }
 </script>
 
-<!-- ================================================================
-     ヘッダー
-     ================================================================ -->
+<!-- ヘッダー -->
 <header class="app-header">
   <h1>SES 見積・注文書 作成ツール</h1>
+  <span id="currentRecordBadge" style="display:none;background:#7c3aed;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px"></span>
   <span class="subtitle">入力内容は自動保存されます</span>
 </header>
 
-<!-- ================================================================
-     タブバー
-     ================================================================ -->
+<!-- タブバー -->
 <nav class="tab-bar">
   <button class="tab-btn active" data-tab="form">入力フォーム</button>
   <button class="tab-btn" data-tab="mitsumori">見積書</button>
   <button class="tab-btn" id="tab-doc2-btn" data-tab="doc2">注文書</button>
+  <button class="tab-btn" data-tab="history">📂 履歴</button>
   <button class="tab-btn" data-tab="settings">設定</button>
 </nav>
 
 <!-- ================================================================
-     入力フォームパネル
+     入力フォーム
      ================================================================ -->
 <div class="tab-panel active" id="panel-form">
 <div class="form-wrapper">
@@ -114,16 +104,16 @@
         <input type="text" id="clientName" placeholder="例：株式会社○○">
       </div>
       <div class="field">
-        <label>注文先会社名（注文書/発注書宛先）</label>
+        <label>注文先会社名（注文書・発注書宛先）</label>
         <input type="text" id="orderCompanyName" placeholder="協力会社名・BP会社名">
       </div>
       <div class="field full">
         <label>業務内容</label>
-        <input type="text" id="businessContent" placeholder="例：業務支援及びそれに付随する業務">
+        <input type="text" id="businessContent">
       </div>
       <div class="field full">
         <label>作業場所</label>
-        <input type="text" id="workLocation" placeholder="例：貴社指定場所">
+        <input type="text" id="workLocation">
       </div>
       <div class="field">
         <label>作業期間 開始</label>
@@ -135,19 +125,19 @@
       </div>
       <div class="field">
         <label>作業開始時間</label>
-        <input type="time" id="startTime" value="10:00">
+        <input type="time" id="startTime">
       </div>
       <div class="field">
         <label>作業終了時間</label>
-        <input type="time" id="endTime" value="19:00">
+        <input type="time" id="endTime">
       </div>
       <div class="field">
         <label>休憩時間</label>
-        <input type="time" id="breakTime" value="01:00">
+        <input type="time" id="breakTime">
       </div>
       <div class="field">
         <label>週稼働（日数）</label>
-        <input type="number" id="weeklyDays" min="1" max="7" value="5">
+        <input type="number" id="weeklyDays" min="1" max="7">
       </div>
       <div class="field">
         <label>契約形態</label>
@@ -166,7 +156,7 @@
       </div>
       <div class="field">
         <label>支払いサイト（日）</label>
-        <input type="number" id="paymentSite" value="30" min="0" max="90">
+        <input type="number" id="paymentSite" min="0" max="90">
         <div class="field-hint">30 → 月末締め翌月末日払い</div>
       </div>
       <div class="field">
@@ -176,7 +166,7 @@
           <option value="有">有</option>
         </select>
       </div>
-      <div class="field" id="autoRenewalPeriodRow" style="display:none">
+      <div class="field" id="autoRenewalPeriodRow">
         <label>自動更新期間</label>
         <input type="text" id="autoRenewalPeriod" placeholder="例：1ヶ月、3ヶ月">
       </div>
@@ -197,17 +187,17 @@
         </select>
       </div>
       <div class="field" id="baseHoursOverrideRow">
-        <label>基本時間 手動設定（0=自動）</label>
-        <input type="number" id="baseHoursOverride" min="0" max="300" value="0" placeholder="0">
+        <label>基本時間 手動設定（空欄=自動）</label>
+        <input type="number" id="baseHoursOverride" min="0" max="300" placeholder="自動計算">
         <div class="field-hint" id="baseHoursPreview">基本時間: 自動計算</div>
       </div>
       <div class="field" id="settlementRangeRow">
         <label>控除幅（時間）</label>
-        <input type="number" id="deductionRange" min="0" max="100" value="20">
+        <input type="number" id="deductionRange" min="0" max="100">
       </div>
       <div class="field" id="settlementMethodRow">
         <label>超過幅（時間）</label>
-        <input type="number" id="excessRange" min="0" max="100" value="20">
+        <input type="number" id="excessRange" min="0" max="100">
       </div>
       <div class="field">
         <label>時間単位（分）</label>
@@ -234,7 +224,7 @@
     </div>
   </div>
 
-  <!-- 作業者 -->
+  <!-- 作業者① -->
   <div class="form-section">
     <div class="form-section-title">作業者①（主要員）</div>
     <div class="worker-row">
@@ -248,95 +238,54 @@
       </div>
       <div>
         <div class="worker-num">週稼働</div>
-        <input type="number" id="w0_days" min="1" max="7" value="5">
+        <input type="number" id="w0_days" min="1" max="7">
       </div>
       <div>
         <div class="worker-num">月単価（円）</div>
         <input type="number" id="w0_price" min="0" placeholder="500000">
       </div>
     </div>
-    <!-- 計算プレビュー -->
-    <div class="calc-preview" id="calcPreview0"></div>
+    <div class="calc-preview" id="calcPreview0">単価を入力すると計算結果が表示されます</div>
 
-    <!-- 追加要員フラグ -->
     <div class="flag-row">
       <label>
         <input type="checkbox" id="isMultiWorker">
         追加要員あり（②〜⑤）
       </label>
-      <span style="font-size:11px;color:var(--text-muted)">※契約形態・業務時間・精算が同じ場合のみ</span>
+      <span style="font-size:11px;color:var(--muted)">※契約形態・業務時間・精算が同じ場合のみ</span>
     </div>
   </div>
 
   <!-- 追加要員 -->
-  <div class="form-section" id="multiWorkerSection" style="display:none">
+  <div class="form-section" id="multiWorkerSection">
     <div class="form-section-title">追加要員（②〜⑤）</div>
-    <!-- ②〜⑤ の入力行 -->
-    <script>
-      (function() {
-        const labels = ['②','③','④','⑤'];
-        document.addEventListener('DOMContentLoaded', function() {
-          const section = document.getElementById('multiWorkerSection');
-          labels.forEach(function(lbl, idx) {
-            const i = idx + 1;
-            const row = document.createElement('div');
-            row.className = 'worker-row';
-            row.innerHTML =
-              '<div><div class="worker-num">氏名 ' + lbl + '</div>' +
-              '<input type="text" id="w' + i + '_name" placeholder="氏 名"></div>' +
-              '<div><div class="worker-num">フリガナ</div>' +
-              '<input type="text" id="w' + i + '_kana" placeholder="シ メイ"></div>' +
-              '<div><div class="worker-num">週稼働</div>' +
-              '<input type="number" id="w' + i + '_days" min="1" max="7" value="5"></div>' +
-              '<div><div class="worker-num">月単価（円）</div>' +
-              '<input type="number" id="w' + i + '_price" min="0" placeholder="500000"></div>';
-            section.appendChild(row);
-          });
-        });
-      })();
-    </script>
+    <div id="multiWorkerRows"></div>
   </div>
 
   <!-- オプション -->
   <div class="form-section">
     <div class="form-section-title">オプション</div>
-
-    <!-- フラグ -->
     <div class="flag-row">
-      <label>
-        <input type="checkbox" id="isBP">
-        BPから人材を借りる（注文書→発注書に変更）
-      </label>
-      <label>
-        <input type="checkbox" id="isReceipt">
-        請書を作成（注文書→請書に変更）
-      </label>
+      <label><input type="checkbox" id="isBP"> BPから人材を借りる（注文書→発注書に変更）</label>
+      <label><input type="checkbox" id="isReceipt"> 請書を作成（注文書→請書に変更）</label>
     </div>
     <div class="flag-row">
-      <label>
-        <input type="checkbox" id="travelIncluded" checked>
-        交通費：込み
-      </label>
-      <div class="field" style="margin:0;padding:0;flex:1;min-width:200px">
-        <input type="text" id="travelNote" placeholder="交通費備考">
+      <label><input type="checkbox" id="travelIncluded"> 交通費：込み</label>
+      <div style="flex:1;min-width:180px">
+        <input type="text" id="travelNote" placeholder="交通費備考" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
       </div>
     </div>
     <div class="flag-row">
-      <div class="field" style="margin:0;padding:0;flex:1">
-        <label style="font-size:11px;color:var(--text-muted)">出張・宿泊備考</label>
-        <input type="text" id="businessTripNote" placeholder="備考欄（出張交通費・宿泊費）">
+      <div style="flex:1">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">出張・宿泊備考</label>
+        <input type="text" id="businessTripNote" placeholder="出張交通費・宿泊費 備考" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
       </div>
     </div>
-
-    <!-- 初月日割 -->
     <div class="flag-row">
-      <label>
-        <input type="checkbox" id="isDailyCalc">
-        初月日割計算
-      </label>
-      <span style="font-size:11px;color:var(--text-muted)">※追加要員と併用不可</span>
+      <label><input type="checkbox" id="isDailyCalc"> 初月日割計算</label>
+      <span style="font-size:11px;color:var(--muted)">※追加要員と併用不可</span>
     </div>
-    <div id="dailySection" style="display:none">
+    <div id="dailySection">
       <div class="form-grid">
         <div class="field">
           <label>日割 開始日</label>
@@ -358,8 +307,9 @@
   <div class="form-section">
     <div class="form-actions">
       <button type="button" class="btn btn-primary" onclick="switchTab('mitsumori')">見積書を確認</button>
-      <button type="button" class="btn btn-primary" onclick="switchTab('doc2')" id="btn-doc2">注文書を確認</button>
-      <button type="button" class="btn btn-danger" onclick="resetForm()">リセット</button>
+      <button type="button" class="btn btn-primary" id="btn-doc2" onclick="switchTab('doc2')">注文書を確認</button>
+      <button type="button" class="btn btn-save"    onclick="openSaveModal()">💾 保存</button>
+      <button type="button" class="btn btn-danger"  onclick="resetForm()">リセット</button>
     </div>
   </div>
 
@@ -368,124 +318,161 @@
 </div><!-- /panel-form -->
 
 <!-- ================================================================
-     見積書パネル
+     見積書
      ================================================================ -->
 <div class="tab-panel" id="panel-mitsumori">
   <div class="preview-panel-wrap">
     <div class="preview-toolbar">
       <h2>御見積書 プレビュー</h2>
-      <button class="btn btn-ghost" onclick="switchTab('form')">← 入力に戻る</button>
-      <button class="btn btn-print" onclick="printDoc('mitsumori')">🖨 印刷 / PDF保存</button>
+      <button class="btn btn-ghost" onclick="switchTab('form')">← 戻る</button>
+      <button class="btn btn-print" onclick="printDoc('mitsumori')">🖨 印刷 / PDF</button>
     </div>
     <div id="preview-mitsumori"></div>
   </div>
 </div>
 
 <!-- ================================================================
-     注文書/発注書/請書パネル
+     注文書/発注書/請書
      ================================================================ -->
 <div class="tab-panel" id="panel-doc2">
   <div class="preview-panel-wrap">
     <div class="preview-toolbar">
       <h2 id="doc2-preview-title">注文書 プレビュー</h2>
-      <button class="btn btn-ghost" onclick="switchTab('form')">← 入力に戻る</button>
-      <button class="btn btn-print" onclick="printDoc('doc2')">🖨 印刷 / PDF保存</button>
+      <button class="btn btn-ghost" onclick="switchTab('form')">← 戻る</button>
+      <button class="btn btn-print" onclick="printDoc('doc2')">🖨 印刷 / PDF</button>
     </div>
     <div id="preview-doc2"></div>
   </div>
 </div>
 
 <!-- ================================================================
-     設定パネル
+     履歴
+     ================================================================ -->
+<div class="tab-panel" id="panel-history">
+  <div class="history-wrapper">
+    <div class="history-toolbar">
+      <h2>保存済み見積一覧</h2>
+      <button class="btn btn-ghost" onclick="loadHistoryList()">🔄 再読込</button>
+    </div>
+    <div id="historyList"><div class="history-empty">読み込み中...</div></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     設定
      ================================================================ -->
 <div class="tab-panel" id="panel-settings">
   <div class="settings-wrapper">
-    <div class="settings-note">
-      書類に表示される自社（発行元）の情報を設定します。変更は自動保存されます。
-    </div>
     <form id="formSettings">
+
+      <!-- 自社情報 -->
       <div class="form-section">
         <div class="form-section-title">自社情報（書類発行元）</div>
         <div class="form-grid">
           <div class="field full">
             <label>会社名</label>
-            <input type="text" id="s_companyName" placeholder="株式会社○○">
+            <input type="text" id="s_companyName">
           </div>
           <div class="field full">
             <label>住所</label>
-            <textarea id="s_address" rows="3" placeholder="〒000-0000&#10;東京都..."></textarea>
+            <textarea id="s_address" rows="3"></textarea>
           </div>
           <div class="field">
             <label>電話番号</label>
-            <input type="text" id="s_tel" placeholder="03-0000-0000">
+            <input type="text" id="s_tel">
           </div>
         </div>
       </div>
+
+      <!-- Supabase設定 -->
+      <div class="form-section">
+        <div class="form-section-title">Supabase 設定（履歴保存）</div>
+        <div class="settings-note">
+          履歴保存機能を使うにはSupabaseプロジェクトが必要です。<br>
+          ① <strong>supabase.com</strong> でプロジェクト作成 →
+          ② Settings &gt; API で URL と anon key を確認 →
+          ③ 下記SQLをSQL Editorで実行 →
+          ④ URLとKeyを入力して「接続」
+        </div>
+        <pre class="settings-sql">-- SQL Editor で実行してください
+create table ses_estimates (
+  id          uuid default gen_random_uuid() primary key,
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now(),
+  title       text not null,
+  client_name text,
+  is_bp       boolean default false,
+  form_data   jsonb not null
+);
+alter table ses_estimates enable row level security;
+create policy "allow_all" on ses_estimates for all using (true) with check (true);</pre>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Supabase URL</label>
+            <input type="text" id="s_sbUrl" placeholder="https://xxxxxxxxxxxx.supabase.co">
+          </div>
+          <div class="field full">
+            <label>Anon Key（公開鍵）</label>
+            <input type="text" id="s_sbKey" placeholder="eyJhbGci...">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" onclick="applySupabaseSettings()">接続テスト・適用</button>
+          <span id="sbStatus" style="font-size:12px;margin-left:8px"></span>
+        </div>
+      </div>
+
     </form>
   </div>
 </div>
 
 <!-- ================================================================
-     計算プレビュー更新（入力リアルタイム）
+     保存モーダル
+     ================================================================ -->
+<div id="saveModal" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <h3>💾 見積を保存</h3>
+    <label>タイトル（クライアント名・案件名など）</label>
+    <input type="text" id="saveTitle" placeholder="例：株式会社○○ 2025年4月〜">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeSaveModal()">キャンセル</button>
+      <button class="btn btn-save" id="saveBtnExec" onclick="executeSave()">保存</button>
+    </div>
+    <div class="modal-msg" id="saveMsg"></div>
+    <div class="modal-err" id="saveErr"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     追加要員行を動的生成
      ================================================================ -->
 <script>
-  // calc-preview ①を入力変更のたびに更新
-  function updateCalcPreview() {
-    const p = document.getElementById('calcPreview0');
-    if (!p) return;
-    const price = parseInt(document.getElementById('w0_price')?.value) || 0;
-    const stype = document.getElementById('settlementType')?.value || '中央割';
-    const rtype = document.getElementById('roundingType')?.value || '切捨て';
-    const base  = parseInt(document.getElementById('baseHoursOverride')?.value) || 0;
-    const decl  = parseInt(document.getElementById('deductionRange')?.value) || 0;
-    const excl  = parseInt(document.getElementById('excessRange')?.value) || 0;
-    const startDate = document.getElementById('startDate')?.value || '';
-    const endDate   = document.getElementById('endDate')?.value || '';
-
-    if (!price) { p.textContent = '単価を入力すると計算結果が表示されます'; return; }
-
-    // 簡易計算
-    const startT = document.getElementById('startTime')?.value || '10:00';
-    const endT   = document.getElementById('endTime')?.value || '19:00';
-    const brk    = document.getElementById('breakTime')?.value || '01:00';
-    const wDays  = parseInt(document.getElementById('weeklyDays')?.value) || 5;
-
-    function toH(t) { const [h,m]=(t||'0:0').split(':').map(Number); return h+m/60; }
-    const daily = toH(endT) - toH(startT) - toH(brk);
-    const bh = base > 0 ? base : (wDays * daily * 4);
-
-    let msg = '';
-    if (stype !== '固定' && stype !== '時給') {
-      const rawRate = price / bh;
-      const rate = rtype === '切上げ' ? Math.ceil(rawRate/10)*10 : Math.floor(rawRate/10)*10;
-      const lower = bh - decl, upper = bh + excl;
-      msg = `基本時間: ${bh}h　精算幅: ${lower}h〜${upper}h　時給: ${rate.toLocaleString()}円`;
-    } else if (stype === '時給') {
-      msg = `時給単価: ${price.toLocaleString()}円`;
-    } else {
-      msg = `固定: ${price.toLocaleString()}円/月`;
-    }
-
-    if (startDate && endDate) {
-      const s = new Date(startDate+'T00:00:00'), e = new Date(endDate+'T00:00:00');
-      const months = (e.getFullYear()-s.getFullYear())*12+(e.getMonth()-s.getMonth())+1;
-      if (months > 0) {
-        const total = price * months;
-        msg += `　→ ${months}ヶ月 合計: ${total.toLocaleString()}円（税込: ${Math.floor(total*1.1).toLocaleString()}円）`;
-      }
-    }
-    p.textContent = msg;
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('formMain').addEventListener('input', updateCalcPreview);
-    document.getElementById('formMain').addEventListener('change', updateCalcPreview);
-    updateCalcPreview();
+    const wrap = document.getElementById('multiWorkerRows');
+    if (!wrap) return;
+    ['②','③','④','⑤'].forEach(function(lbl, idx) {
+      const i = idx + 1;
+      const row = document.createElement('div');
+      row.className = 'worker-row';
+      row.innerHTML =
+        '<div><div class="worker-num">氏名 ' + lbl + '</div>' +
+        '<input type="text" id="w' + i + '_name" placeholder="氏 名"></div>' +
+        '<div><div class="worker-num">フリガナ</div>' +
+        '<input type="text" id="w' + i + '_kana" placeholder="シ メイ"></div>' +
+        '<div><div class="worker-num">週稼働</div>' +
+        '<input type="number" id="w' + i + '_days" min="1" max="7"></div>' +
+        '<div><div class="worker-num">月単価（円）</div>' +
+        '<input type="number" id="w' + i + '_price" min="0" placeholder="500000"></div>';
+      wrap.appendChild(row);
+    });
   });
 </script>
 
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/calc.js"></script>
 <script src="js/render.js"></script>
+<script src="js/db.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
