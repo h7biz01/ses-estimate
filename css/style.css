@@ -177,7 +177,13 @@ body {
 .dc-lbl { white-space: nowrap; color: #555; }
 .dc-name { font-weight: bold; font-size: 10pt; }
 .seal { display: inline-block; margin-left: 8px; font-size: 18pt; color: #cc0000; }
-.seal-img { height: 52px; width: auto; margin-left: 10px; vertical-align: middle; opacity: 0.85; }
+.seal-img {
+  height: 78px; width: auto;
+  margin-left: -22px;        /* 会社名に被せる */
+  vertical-align: middle;
+  position: relative; top: -4px;
+  opacity: 0.88;
+}
 
 /* --- 区切り線 --- */
 .doc-hr { border: none; border-top: 2px solid var(--doc-border); margin: 8px 0; }
@@ -232,6 +238,16 @@ body {
 .total-val { font-size: 10pt; font-weight: bold; }
 
 .doc-mgmt { text-align: right; font-size: 8pt; color: #555; margin-top: 6px; }
+
+/* 編集モード */
+.a4-page[contenteditable="true"] {
+  outline: 3px solid #f59e0b;
+  outline-offset: 4px;
+  cursor: text;
+}
+.btn-edit        { background: #fff; color: #92400e; border-color: #fcd34d; }
+.btn-edit:hover  { background: #fffbeb; }
+.btn-edit.active { background: #f59e0b; color: #fff; border-color: #f59e0b; }
 
 /* テキスト配置 */
 .text-c { text-align: center; }

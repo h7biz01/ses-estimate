@@ -325,6 +325,7 @@
     <div class="preview-toolbar">
       <h2>御見積書 プレビュー</h2>
       <button class="btn btn-ghost" onclick="switchTab('form')">← 戻る</button>
+      <button class="btn btn-edit"  id="editBtn-mitsumori" onclick="toggleEdit('mitsumori')">✏️ 編集モード</button>
       <button class="btn btn-print" onclick="printDoc('mitsumori')">🖨 印刷 / PDF</button>
     </div>
     <div id="preview-mitsumori"></div>
@@ -339,6 +340,7 @@
     <div class="preview-toolbar">
       <h2 id="doc2-preview-title">注文書 プレビュー</h2>
       <button class="btn btn-ghost" onclick="switchTab('form')">← 戻る</button>
+      <button class="btn btn-edit"  id="editBtn-doc2" onclick="toggleEdit('doc2')">✏️ 編集モード</button>
       <button class="btn btn-print" onclick="printDoc('doc2')">🖨 印刷 / PDF</button>
     </div>
     <div id="preview-doc2"></div>

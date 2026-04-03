@@ -262,6 +262,9 @@ function switchTab(name) {
     p.classList.toggle('active', p.id === `panel-${name}`));
 
   if (name === 'mitsumori' || name === 'doc2') {
+    // 編集モードを解除してから再描画
+    const btn = document.getElementById(`editBtn-${name}`);
+    if (btn) { btn.textContent = '✏️ 編集モード'; btn.classList.remove('active'); }
     const dtype = name === 'mitsumori' ? 'mitsumori' : getDoc2Type();
     refreshPreview(dtype, name);
   }
@@ -282,6 +285,28 @@ function refreshPreview(docType, panelName) {
   const html   = renderDoc(docType, result, formData, settings);
   const el     = document.getElementById(`preview-${panelName}`);
   if (el) el.innerHTML = html;
+}
+
+// =====================================================================
+// 編集モード切替
+// =====================================================================
+function toggleEdit(panelName) {
+  const container = document.getElementById(`preview-${panelName}`);
+  const btn       = document.getElementById(`editBtn-${panelName}`);
+  const page      = container && container.querySelector('.a4-page');
+  if (!page || !btn) return;
+
+  const isEditing = page.getAttribute('contenteditable') === 'true';
+  if (isEditing) {
+    page.removeAttribute('contenteditable');
+    btn.textContent = '✏️ 編集モード';
+    btn.classList.remove('active');
+  } else {
+    page.setAttribute('contenteditable', 'true');
+    page.focus();
+    btn.textContent = '✅ 編集完了';
+    btn.classList.add('active');
+  }
 }
 
 // =====================================================================
